@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>吕祖灵签·解签</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700&family=ZCOOL+XiaoWei&display=swap');
+
+  :root {
+    --ink: #1a1008;
+    --paper: #f5ede0;
+    --aged: #e8d5b0;
+    --cinnabar: #c0392b;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --smoke: #6b5b45;
+    --mist: #9b8b75;
+    --seal: #8b0000;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Serif SC', serif;
+    background: var(--ink);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Background ── */
+  .bg-texture {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(139,69,19,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(184,134,11,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, rgba(139,0,0,0.06) 0%, transparent 50%),
+      linear-gradient(160deg, #0d0905 0%, #1a0f08 40%, #120a05 100%);
+  }
+
+  .bg-pattern {
+    position: fixed; inset: 0; z-index: 0; opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 38px, rgba(184,134,11,0.5) 38px, rgba(184,134,11,0.5) 39px),
+      repeating-linear-gradient(90deg, transparent, transparent 38px, rgba(184,134,11,0.5) 38px, rgba(184,134,11,0.5) 39px);
+  }
+
+  /* ── Layout ── */
+  .wrapper {
+    position: relative; z-index: 1;
+    max-width: 780px; margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 52px 0 32px;
+    position: relative;
+  }
+
+  .header::before, .header::after {
+    content: '';
+    position: absolute; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .header::before { top: 0; }
+  .header::after { bottom: 0; }
+
+  .header-badge {
+    display: inline-block;
+    font-size: 11px; letter-spacing: 4px;
+    color: var(--gold); opacity: 0.7;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'ZCOOL XiaoWei', serif;
+    font-size: clamp(36px, 8vw, 58px);
+    color: var(--paper);
+    letter-spacing: 8px;
+    text-shadow: 0 2px 24px rgba(184,134,11,0.3);
+    line-height: 1.1;
+  }
+
+  .header-sub {
+    margin-top: 10px;
+    font-size: 13px; color: var(--mist);
+    letter-spacing: 3px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: linear-gradient(135deg, #f7eedc 0%, #f0e4c8 50%, #e8d5b0 100%);
+    border: 1px solid rgba(184,134,11,0.3);
+    border-radius: 2px;
+    padding: 36px 40px;
+    margin-bottom: 20px;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 0 60px rgba(184,134,11,0.05);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute; inset: 6px;
+    border: 1px solid rgba(184,134,11,0.2);
+    border-radius: 1px; pointer-events: none;
+  }
+
+  .section-title {
+    font-family: 'ZCOOL XiaoWei', serif;
+    font-size: 17px; color: var(--seal);
+    letter-spacing: 4px; margin-bottom: 22px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(139,0,0,0.15);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .section-title::before {
+    content: '◆';
+    font-size: 10px; color: var(--gold);
+  }
+
+  /* ── Form ── */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .form-row.triple {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .form-row.single {
+    grid-template-columns: 1fr;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px; color: var(--smoke);
+    letter-spacing: 2px; margin-bottom: 6px;
+  }
+
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: rgba(245,237,224,0.8);
+    border: 1px solid rgba(107,91,69,0.3);
+    border-radius: 1px;
+    padding: 10px 14px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 14px; color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(184,134,11,0.1);
+  }
+
+  .field textarea {
+    resize: vertical; min-height: 80px;
+  }
+
+  /* ── Shake Button ── */
+  .btn-shake {
+    display: block; width: 100%;
+    background: linear-gradient(135deg, var(--seal) 0%, #6b0000 50%, var(--seal) 100%);
+    color: #f5ede0;
+    border: none; border-radius: 1px;
+    padding: 16px;
+    font-family: 'ZCOOL XiaoWei', serif;
+    font-size: 20px; letter-spacing: 6px;
+    cursor: pointer;
+    position: relative; overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(139,0,0,0.5);
+  }
+
+  .btn-shake::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.07) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+
+  .btn-shake:hover::before { transform: translateX(100%); }
+  .btn-shake:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(139,0,0,0.6); }
+  .btn-shake:active { transform: translateY(0); }
+  .btn-shake:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ── Sign Display ── */
+  .sign-panel {
+    display: none;
+    animation: fadeUp 0.5s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .sign-header {
+    text-align: center; margin-bottom: 24px;
+  }
+
+  .sign-number-badge {
+    display: inline-block;
+    border: 1px solid var(--gold);
+    padding: 4px 16px;
+    font-size: 11px; letter-spacing: 4px; color: var(--gold);
+    margin-bottom: 12px;
+  }
+
+  .sign-level-tag {
+    display: inline-block;
+    padding: 4px 18px;
+    font-size: 13px; letter-spacing: 3px;
+    border-radius: 1px;
+    margin-bottom: 12px;
+    font-family: 'ZCOOL XiaoWei', serif;
+  }
+
+  .sign-title-text {
+    font-family: 'ZCOOL XiaoWei', serif;
+    font-size: 32px; color: var(--ink);
+    letter-spacing: 6px;
+  }
+
+  .sign-poem-box {
+    background: rgba(245,237,224,0.5);
+    border-left: 3px solid var(--cinnabar);
+    padding: 18px 22px;
+    margin: 20px 0;
+  }
+
+  .sign-poem-box p {
+    font-size: 16px; line-height: 2.2;
+    color: var(--ink); letter-spacing: 3px;
+    text-align: center;
+  }
+
+  /* Level colors */
+  .level-凶    { background: rgba(139,0,0,0.12); color: #8b0000; border: 1px solid rgba(139,0,0,0.3); }
+  .level-小凶  { background: rgba(160,60,0,0.1); color: #a03c00; border: 1px solid rgba(160,60,0,0.3); }
+  .level-次于中平 { background: rgba(100,80,0,0.1); color: #645000; border: 1px solid rgba(100,80,0,0.3); }
+  .level-中平  { background: rgba(50,80,50,0.1); color: #325032; border: 1px solid rgba(50,80,50,0.3); }
+  .level-优于中平 { background: rgba(0,80,80,0.1); color: #005050; border: 1px solid rgba(0,80,80,0.3); }
+  .level-大吉  { background: rgba(120,90,0,0.15); color: #786400; border: 1px solid rgba(184,134,11,0.4); }
+
+  /* ── AI Result ── */
+  .result-panel {
+    display: none;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .result-block {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(245,237,224,0.4);
+    border: 1px solid rgba(107,91,69,0.2);
+    position: relative;
+  }
+
+  .result-block-label {
+    font-size: 11px; letter-spacing: 3px; color: var(--smoke);
+    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+
+  .result-block-label::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: rgba(107,91,69,0.2);
+  }
+
+  .result-block-text {
+    font-size: 15px; line-height: 2.0;
+    color: var(--ink); letter-spacing: 0.5px;
+  }
+
+  /* ── Loading ── */
+  .loading-wrap {
+    display: none; text-align: center; padding: 40px 0;
+  }
+
+  .incense {
+    display: inline-flex; flex-direction: column; align-items: center;
+    gap: 6px;
+  }
+
+  .incense-stick {
+    width: 3px; height: 60px;
+    background: linear-gradient(to bottom, #d4a017, #8b4513);
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .smoke-anim {
+    width: 2px; height: 30px;
+    background: linear-gradient(to top, rgba(155,139,117,0.8), transparent);
+    border-radius: 50%;
+    animation: smokeDrift 2s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  @keyframes smokeDrift {
+    0%   { transform: scaleX(1) translateX(0); opacity: 0.8; }
+    33%  { transform: scaleX(2) translateX(4px); opacity: 0.5; }
+    66%  { transform: scaleX(1.5) translateX(-3px); opacity: 0.3; }
+    100% { transform: scaleX(0.5) translateX(2px); opacity: 0; }
+  }
+
+  .loading-text {
+    margin-top: 16px;
+    font-size: 13px; color: var(--mist);
+    letter-spacing: 3px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* ── API Key Notice ── */
+  .api-notice {
+    background: rgba(184,134,11,0.08);
+    border: 1px solid rgba(184,134,11,0.25);
+    padding: 12px 16px;
+    font-size: 12px; color: var(--smoke);
+    letter-spacing: 1px; line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    text-align: center; margin: 4px 0 20px;
+    font-size: 14px; color: var(--gold); opacity: 0.5;
+    letter-spacing: 8px;
+  }
+
+  /* ── Disclaimer ── */
+  .disclaimer {
+    text-align: center;
+    font-size: 11px; color: rgba(155,139,117,0.5);
+    letter-spacing: 2px; margin-top: 30px;
+    line-height: 2;
+  }
+
+  /* ── Reset btn ── */
+  .btn-reset {
+    display: block; width: 100%;
+    background: transparent;
+    border: 1px solid rgba(107,91,69,0.4);
+    color: var(--smoke);
+    padding: 12px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 13px; letter-spacing: 3px;
+    cursor: pointer; margin-top: 10px;
+    transition: all 0.2s;
+  }
+
+  .btn-reset:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* ── Error ── */
+  .error-msg {
+    display: none;
+    background: rgba(139,0,0,0.08);
+    border: 1px solid rgba(139,0,0,0.3);
+    padding: 14px 18px;
+    font-size: 13px; color: #8b0000;
+    letter-spacing: 1px; line-height: 1.8;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 560px) {
+    .card { padding: 24px 20px; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-row.triple { grid-template-columns: 1fr 1fr; }
+    .header h1 { letter-spacing: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-texture"></div>
+<div class="bg-pattern"></div>
+
+<div class="wrapper">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-badge">吕洞宾祖师 · 灵签指引</div>
+    <h1>吕祖灵签</h1>
+    <div class="header-sub">诚心所问，签文指引</div>
+  </header>
+
+  <!-- Step 1: User Info -->
+  <div class="card" id="step1">
+    <div class="section-title">请告知尊驾信息</div>
+
+    <div class="form-row">
+      <div class="field">
+        <label>昵称</label>
+        <input type="text" id="nickname" placeholder="如：阿明" maxlength="10">
+      </div>
+      <div class="field">
+        <label>性别</label>
+        <select id="gender">
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="field">
+        <label>年龄段</label>
+        <select id="age_range">
+          <option value="20岁以下">20岁以下</option>
+          <option value="20-30" selected>20-30岁</option>
+          <option value="30-40">30-40岁</option>
+          <option value="40-50">40-50岁</option>
+          <option value="50-60">50-60岁</option>
+          <option value="60岁以上">60岁以上</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>感情状态</label>
+        <select id="emotion_status">
+          <option value="单身">单身</option>
+          <option value="恋爱中">恋爱中</option>
+          <option value="已婚">已婚</option>
+          <option value="离异">离异</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row single">
+      <div class="field">
+        <label>心中所问（请认真书写）</label>
+        <textarea id="user_question" placeholder="例：我最近想换工作，不知道时机对不对……" maxlength="200"></textarea>
+      </div>
+    </div>
+
+    <div class="api-notice">
+      ⚙️ API 设置：请在下方填写您的 Google Gemini API Key 以启用 AI 解签功能（仅在本地浏览器运行，不会上传至服务器）
+    </div>
+
+    <div class="form-row single">
+      <div class="field">
+        <label>Google Gemini API Key</label>
+        <input type="password" id="api_key" placeholder="AIza..." autocomplete="off">
+      </div>
+    </div>
+
+    <button class="btn-shake" id="btn-shake" onclick="startShake()">
+      🙏 &nbsp; 诚心求签
+    </button>
+
+    <div class="error-msg" id="error-msg"></div>
+  </div>
+
+  <!-- Step 2: Sign Display -->
+  <div class="card sign-panel" id="sign-panel">
+    <div class="section-title">签文降临</div>
+    <div class="sign-header">
+      <div class="sign-number-badge" id="sign-number-badge"></div>
+      <br>
+      <span class="sign-level-tag" id="sign-level-tag"></span>
+      <br>
+      <div class="sign-title-text" id="sign-title-text"></div>
+    </div>
+    <div class="sign-poem-box">
+      <p id="sign-poem-text"></p>
+    </div>
+    <div class="divider">✦ &nbsp; &nbsp; ✦</div>
+    <div id="sign-interp" style="font-size:13px;color:var(--smoke);line-height:2;letter-spacing:1px;"></div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-wrap" id="loading-wrap">
+    <div class="incense">
+      <div class="smoke-anim"></div>
+      <div class="incense-stick"></div>
+    </div>
+    <div class="loading-text">祖师正在解签，请稍候……</div>
+  </div>
+
+  <!-- Step 3: AI Result -->
+  <div class="card result-panel" id="result-panel">
+    <div class="section-title">解签指引</div>
+
+    <div class="result-block">
+      <div class="result-block-label">问题拆解</div>
+      <div class="result-block-text" id="res-breakdown"></div>
+    </div>
+
+    <div class="result-block">
+      <div class="result-block-label">签文解读</div>
+      <div class="result-block-text" id="res-translation"></div>
+    </div>
+
+    <div class="result-block">
+      <div class="result-block-label">行动指引</div>
+      <div class="result-block-text" id="res-advice"></div>
+    </div>
+
+    <button class="btn-reset" onclick="resetAll()">重新求签</button>
+  </div>
+
+  <div class="disclaimer">
+    解签结果仅供参考娱乐，不构成任何专业建议<br>
+    吕祖灵签 · 百签传世 · 趋吉避凶
+  </div>
+
+</div>
+
+<script>
+// ── Sign Data (100 signs) ──
+const SIGNS = [
+  {n:1,l:"凶",t:"狂风折木",p:"狂风骤雨折庭柯，万物凋零奈若何。劝君急避深林里，莫待倾巢损更多。",i:"财运：大破财，忌一切投资、借贷、合伙；事业：诸事大败，立即停止所有项目；感情：决裂、背叛、争吵不休；健康：突发疾病、意外受伤；今日建议：守宅不出，不与人争，破财免灾。",w:30},
+  {n:2,l:"凶",t:"险滩行舟",p:"险滩行舟浪拍天，舵折帆倾势倒悬。进退两难无计施，唯有守命待时迁。",i:"财运：血本无归，投资必败；事业：进退维谷，努力无用；感情：冷战、分手、第三者插足；健康：重病缠身，需立即就医；今日建议：不动不做，不投资，不出行。",w:30},
+  {n:3,l:"凶",t:"小人当道",p:"小人得志乱朝纲，忠良受屈暗神伤。口舌是非缠不休，祸起萧墙无处藏。",i:"财运：被人算计、被骗、破财；事业：被陷害、背锅、裁员；感情：被挑拨离间、误会重重；健康：气郁伤身、失眠多梦；今日建议：少说话，少出头，远离小人。",w:30},
+  {n:4,l:"凶",t:"大破财星",p:"黄金散尽复何求，费尽心思总是愁。纵有良田千万顷，一朝倾覆水东流。",i:"财运：严重破财，倾家荡产风险；事业：破产、倒闭、失业；感情：因财失和、家庭破裂；健康：因财伤身、急火攻心；今日建议：关闭所有账户，不碰任何钱财往来。",w:30},
+  {n:5,l:"凶",t:"官司缠身",p:"官司口舌闹纷纷，有理难辩气难伸。破财消灾方得免，否则牢狱祸临身。",i:"财运：因官司破财、罚款；事业：因纠纷停业、整顿；感情：因官司分离、反目；健康：焦虑成疾、精神崩溃；今日建议：主动和解，破财消灾，避免诉讼。",w:30},
+  {n:6,l:"凶",t:"出行大凶",p:"出行路上遇灾星，车翻马倒祸难平。劝君莫踏他乡路，守宅平安度此生。",i:"财运：出行破财、被盗、被骗；事业：出差失败、项目流产；感情：异地恋分手、出行遇桃花劫；健康：车祸、摔伤、意外死亡；今日建议：绝对不出门，取消所有行程。",w:30},
+  {n:7,l:"凶",t:"谋望大败",p:"谋望之事必成空，千辛万苦付东风。早知今日空费力，不如当初守困穷。",i:"财运：求财不得，反遭损失；事业：所有计划失败，努力白费；感情：求爱被拒、婚姻不成；健康：劳累过度、积劳成疾；今日建议：放弃所有目标，安心休息。",w:30},
+  {n:8,l:"凶",t:"家宅不宁",p:"家宅不宁祸事多，鸡飞狗跳闹风波。父子不和兄弟怨，夫妻反目各西东。",i:"财运：家宅破财、被盗、失火；事业：因家庭琐事影响工作；感情：家庭矛盾、夫妻离婚；健康：家人多病、意外伤亡；今日建议：家庭和睦，忍让为先，避免争吵。",w:30},
+  {n:9,l:"凶",t:"感情破裂",p:"恩爱夫妻反目仇，海誓山盟一旦休。破镜难圆终有恨，不如放手各自由。",i:"财运：因感情破财、分割财产；事业：因感情分心、工作失误；感情：分手、离婚、背叛；健康：心碎成疾、抑郁自杀；今日建议：接受现实，放手止损，调整心态。",w:30},
+  {n:10,l:"凶",t:"健康大险",p:"病魔缠身苦不堪，药石无功病难痊。劝君早作修善事，祈求平安度晚年。",i:"财运：因病破财、花光积蓄；事业：因病失业、无法工作；感情：因病被抛弃、无人照顾；健康：绝症、重病、生命垂危；今日建议：立即就医，安心养病，多行善事。",w:30},
+  {n:11,l:"凶",t:"被骗大破",p:"贪得高利入圈套，被骗钱财空懊恼。哭天喊地无用处，只怪当初太心高。",i:"财运：被骗光所有积蓄、负债累累；事业：被合伙人欺骗、项目被骗；感情：被感情骗子欺骗、人财两空；健康：急火攻心、中风瘫痪；今日建议：报警处理，接受现实，从头再来。",w:30},
+  {n:12,l:"凶",t:"妄动招灾",p:"妄动必然招大祸，守身守命莫蹉跎。莫求名利莫贪色，平安二字值千金。",i:"财运：一动就破财，不动则安；事业：一动就失败，不动则稳；感情：一动就吵架，不动则和；健康：一动就受伤，不动则康；今日建议：绝对不动，在家静坐。",w:30},
+  {n:13,l:"凶",t:"是非大祸",p:"是非大祸难脱身，千夫所指万人嗔。远离纷争远离祸，守心守口保安宁。",i:"财运：因是非破财、名誉受损；事业：因是非被开除、身败名裂；感情：因是非被误解、众叛亲离；健康：因是非被打、受伤；今日建议：闭门不出，不与人言，等待风波过去。",w:30},
+  {n:14,l:"凶",t:"事业大败",p:"事业大败难挽回，十年辛苦化成灰。不如归隐山林里，粗茶淡饭度余生。",i:"财运：事业破产、负债累累；事业：公司倒闭、失业下岗；感情：因事业失败被抛弃；健康：压力过大、精神崩溃；今日建议：辞职休息，调整心态，重新规划。",w:30},
+  {n:15,l:"凶",t:"贪则大祸",p:"贪名贪利必大祸，贪色贪财必遭磨。安分守己清贫过，方能平安免灾磨。",i:"财运：因贪破财、因贪入狱；事业：因贪被查、身败名裂；感情：因贪色出轨、家庭破裂；健康：因贪吃喝得病、肥胖三高；今日建议：戒贪戒欲，知足常乐。",w:30},
+  {n:16,l:"凶",t:"人际大凶",p:"人际大凶众叛离，无人助力受人欺。断绝来往少社交，守身守己免灾危。",i:"财运：被朋友骗、被同事坑；事业：被孤立、被排挤、无人帮；感情：被朋友抢对象、被闺蜜背叛；健康：因人际矛盾气出病；今日建议：少社交，少来往，独来独往。",w:30},
+  {n:17,l:"凶",t:"酒色招灾",p:"酒色招灾不可为，风流场中祸相随。远离是非远离色，安稳平安免祸危。",i:"财运：因酒色破财、被敲诈勒索；事业：因酒色误事、被开除；感情：因酒色出轨、离婚；健康：因酒色伤身、性病、肝病；今日建议：戒酒戒色，清心寡欲。",w:30},
+  {n:18,l:"凶",t:"强求必凶",p:"凡事强求必遇凶，放弃等待运再通。守宅守身多行善，方能平安过寒冬。",i:"财运：强求求财必破财；事业：强求升职必失败；感情：强求复合必受伤；健康：强求康复必加重；今日建议：放弃强求，顺其自然。",w:30},
+  {n:19,l:"凶",t:"守身免灾",p:"唯有守身可免灾，莫行莫动莫求财。在家安静多行善，方能平安避祸来。",i:"财运：求财必败，守财则安；事业：做事必错，不做则安；感情：谈情必伤，不谈则安；健康：出门必伤，不出则安；今日建议：在家待着，什么都不做。",w:30},
+  {n:20,l:"凶",t:"天灾人祸",p:"天灾人祸突然来，防不胜防实可哀。劝君多积阴德事，逢凶化吉免祸灾。",i:"财运：因天灾人祸破财、财产损失；事业：因天灾人祸停业、倒闭；感情：因天灾人祸分离、死亡；健康：因天灾人祸受伤、死亡；今日建议：多行善事，祈求平安。",w:30},
+  {n:21,l:"凶",t:"官非临身",p:"官非临身事难休，破财消灾是良谋。若还固执强争理，牢狱之灾在后头。",i:"财运：因官非破财、罚款、没收财产；事业：因官非被调查、停业；感情：因官非分离、离婚；健康：因官非焦虑、失眠；今日建议：主动认错，破财消灾，避免牢狱。",w:30},
+  {n:22,l:"凶",t:"失物难寻",p:"失物难寻影无踪，费尽心思总是空。劝君莫再苦追寻，破财免灾保平安。",i:"财运：丢失贵重物品、被盗；事业：丢失重要文件、项目失败；感情：丢失爱人、无法挽回；健康：丢失健康、生病；今日建议：放弃寻找，接受损失。",w:30},
+  {n:23,l:"凶",t:"谋事不成",p:"谋事不成反受殃，惹得一身是非忙。不如静坐家中坐，免教灾祸到身旁。",i:"财运：谋财不得，反遭损失；事业：谋事不成，反被牵连；感情：谋爱不成，反被羞辱；健康：谋事劳累，生病受伤；今日建议：不谋事，不做事，在家休息。",w:30},
+  {n:24,l:"凶",t:"六亲无靠",p:"六亲无靠独自行，孤苦伶仃无人疼。凡事只能靠自己，莫指望人来帮衬。",i:"财运：无人借钱，无人投资，只能靠自己；事业：无人帮助，无人提携，只能靠自己；感情：无人介绍，无人关心，只能靠自己；健康：无人照顾，只能靠自己；今日建议：独立自强，不依赖任何人。",w:30},
+  {n:25,l:"凶",t:"运途蹇滞",p:"运途蹇滞步难行，事事不顺心不宁。劝君莫要强出头，守待时来运再通。",i:"财运：事事破财，处处不顺；事业：事事失败，处处碰壁；感情：事事不顺，处处吵架；健康：事事生病，处处受伤；今日建议：低调做人，不与人争，等待时机。",w:30},
+  {n:26,l:"凶",t:"口舌成灾",p:"口舌成灾祸连连，是非不断扰心田。守口如瓶少言语，免教灾祸到身边。",i:"财运：因口舌破财、被人讹诈；事业：因口舌被开除、身败名裂；感情：因口舌吵架、分手；健康：因口舌被打、受伤；今日建议：少说话，多做事，不与人争。",w:30},
+  {n:27,l:"凶",t:"疾病缠绵",p:"疾病缠绵久不愈，药石无功苦自知。劝君安心养身体，莫要操劳费心思。",i:"财运：因病破财、花光积蓄；事业：因病失业、无法工作；感情：因病被抛弃、无人照顾；健康：慢性病、久治不愈；今日建议：安心养病，停止工作，注意休息。",w:30},
+  {n:28,l:"凶",t:"婚姻不顺",p:"婚姻不顺多坎坷，夫妻不和常吵骂。若还勉强在一起，终有一日各天涯。",i:"财运：因婚姻破财、分割财产；事业：因婚姻分心、工作失误；感情：夫妻不和、离婚；健康：因婚姻气出病、失眠；今日建议：沟通解决，实在不行就离婚。",w:30},
+  {n:29,l:"凶",t:"投资必败",p:"投资必败血本无，投机取巧祸临身。劝君莫要贪小利，守财安分度光阴。",i:"财运：投资必亏，投机必败；事业：投资项目失败、公司亏损；感情：因投资失败被抛弃；健康：因投资失败急火攻心；今日建议：不投资，不投机，守财为上。",w:30},
+  {n:30,l:"凶",t:"远行不利",p:"远行不利遇灾殃，路途艰险多阻挡。劝君莫要离家乡，守宅平安福自长。",i:"财运：远行破财、被盗、被骗；事业：出差失败、项目流产；感情：异地恋分手、远行遇桃花劫；健康：远行生病、意外受伤；今日建议：不远行，不出门，在家待着。",w:30},
+  {n:31,l:"小凶",t:"风波乍起",p:"风波忽起莫前行，守待天时莫强行。财利不宜轻举动，恐因急躁损安宁。",i:"财运：有破财风险，忌投资、借贷；事业：有波折，不宜冲动决策；感情：有争吵，需冷静沟通；健康：有小恙，注意休息；今日建议：宜静不宜动，耐心等待。",w:30},
+  {n:32,l:"小凶",t:"迷津失路",p:"举目茫然路未明，莫贪捷径误前程。守心静待贵人至，方可从容避险坑。",i:"财运：求财迷茫，易走弯路；事业：方向不明，易犯错误；感情：感情迷茫，不知何去何从；健康：精神恍惚，易出意外；今日建议：不做决策，等待贵人。",w:30},
+  {n:33,l:"小凶",t:"小人暗害",p:"小人暗害最难防，莫信他人莫张扬。守口守心少来往，免教大祸到身旁。",i:"财运：被小人算计、破财；事业：被小人陷害、背锅；感情：被小人挑拨、误会；健康：被小人暗算、受伤；今日建议：防小人，少说话，少来往。",w:30},
+  {n:34,l:"小凶",t:"财耗有损",p:"财禄耗损有损失，不宜投资不宜赌。守财守己莫妄动，免教钱财付水流。",i:"财运：有破财，忌投资、赌博；事业：有损失，不宜扩张；感情：因财失和，需注意；健康：因财伤身，需注意；今日建议：守财，不花钱，不投资。",w:30},
+  {n:35,l:"小凶",t:"口舌是非",p:"口舌是非多缠身，莫与人争莫较真。沉默守己为上策，免惹大祸到家门。",i:"财运：因口舌破财、名誉受损；事业：因口舌被批评、降职；感情：因口舌吵架、冷战；健康：因口舌气出病；今日建议：不与人争，沉默是金。",w:30},
+  {n:36,l:"小凶",t:"不宜出行",p:"不宜出行防凶险，路途恐有祸灾缠。安分守己家中坐，等待时过再向前。",i:"财运：出行破财、被盗；事业：出差不顺、延误；感情：出行吵架、分手；健康：出行受伤、生病；今日建议：少出行，不出远门。",w:30},
+  {n:37,l:"小凶",t:"谋望难成",p:"谋望之事难成功，中间阻碍万千重。莫强行，莫强求，守待来年运再通。",i:"财运：求财难成，需等待；事业：做事难成，需等待；感情：求爱难成，需等待；健康：康复难成，需等待；今日建议：不强行，不勉强，等待时机。",w:30},
+  {n:38,l:"小凶",t:"家宅不安",p:"家宅小有不宁静，口舌纷争闹不停。忍让宽容多沟通，免教小事变大刑。",i:"财运：家宅小破财、漏水、停电；事业：因家庭琐事影响工作；感情：家庭小矛盾、夫妻吵架；健康：家人小感冒、不舒服；今日建议：多沟通，多忍让，家庭和睦。",w:30},
+  {n:39,l:"小凶",t:"感情不顺",p:"感情不顺多风波，误会重重无奈何。冷静沟通莫急躁，否则恐有别离多。",i:"财运：因感情小破财；事业：因感情分心、工作失误；感情：吵架、冷战、误会；健康：因感情心情不好、失眠；今日建议：冷静沟通，互相理解。",w:30},
+  {n:40,l:"小凶",t:"健康欠安",p:"健康欠安要小心，注意身体莫劳心。检查保养多休息，免教小病变大侵。",i:"财运：因病小破财；事业：因病请假、影响工作；感情：因病被照顾、感情升温；健康：小感冒、疲劳、不舒服；今日建议：注意休息，及时就医。",w:30},
+  {n:41,l:"小凶",t:"防被骗",p:"提防被骗莫轻信，莫贪高利莫贪心。守财守己莫妄动，免教钱财被人侵。",i:"财运：易被骗，忌贪小利；事业：易被合伙人骗、项目被骗；感情：易被感情骗子骗；健康：易被庸医骗、花冤枉钱；今日建议：不轻信，不贪心，守财为上。",w:30},
+  {n:42,l:"小凶",t:"进退两难",p:"进退两难路不通，莫行莫动守深宫。等待风云消散后，再谋出路不为穷。",i:"财运：进退都破财，不动则安；事业：进退都失败，不动则稳；感情：进退都受伤，不动则和；健康：进退都生病，不动则康；今日建议：不动，等待时机。",w:30},
+  {n:43,l:"小凶",t:"破财免灾",p:"破财方可免灾殃，莫为钱财断肝肠。舍财保命为上策，安稳平安度时光。",i:"财运：一定会破财，挡不住；事业：一定会有损失，挡不住；感情：一定会有矛盾，挡不住；健康：一定会有小恙，挡不住；今日建议：主动破财，消灾免祸。",w:30},
+  {n:44,l:"小凶",t:"是非缠身",p:"是非缠身难脱身，莫管闲事莫当真。远离纷争远离祸，守心守口保安宁。",i:"财运：因是非小破财；事业：因是非被批评、影响晋升；感情：因是非被误解、影响感情；健康：因是非心情不好、影响健康；今日建议：不管闲事，远离是非。",w:30},
+  {n:45,l:"小凶",t:"事业阻滞",p:"事业阻滞难前行，努力也难有功名。守待时机莫冒进，免教失误毁前程。",i:"财运：事业收入减少、无奖金；事业：工作不顺、压力大、无晋升；感情：因事业压力大、影响感情；健康：因事业劳累、身体不适；今日建议：努力工作，等待时机，不冒进。",w:30},
+  {n:46,l:"小凶",t:"莫求名利",p:"莫求名利莫强求，贪求反惹祸临头。安分守己清贫过，安稳平安免忧愁。",i:"财运：求名求利反破财；事业：求名求利反失败；感情：求名求利反受伤；健康：求名求利反伤身；今日建议：淡泊名利，知足常乐。",w:30},
+  {n:47,l:"小凶",t:"人际不和",p:"人际不和多矛盾，无人助力反相侵。守心守己少来往，免教是非惹上身。",i:"财运：被朋友坑、被同事骗；事业：被排挤、被孤立、无人帮；感情：被朋友抢对象、被闺蜜背叛；健康：因人际矛盾心情不好；今日建议：少社交，少来往，独善其身。",w:30},
+  {n:48,l:"小凶",t:"谨慎守身",p:"谨慎守身莫妄为，风流酒色要远离。免惹祸事免惹灾，安稳平安度光阴。",i:"财运：因酒色小破财；事业：因酒色误事、被批评；感情：因酒色出轨、影响感情；健康：因酒色伤身、不舒服；今日建议：戒酒戒色，谨慎行事。",w:30},
+  {n:49,l:"小凶",t:"守待为上",p:"守待为上莫前行，妄动必然祸不轻。忍耐一时风与雨，过后依然见太平。",i:"财运：妄动必破财，守待则安；事业：妄动必失败，守待则稳；感情：妄动必吵架，守待则和；健康：妄动必受伤，守待则康；今日建议：忍耐，守待，不妄动。",w:30},
+  {n:50,l:"小凶",t:"灾小不妨",p:"灾虽不大亦妨身，守待安宁莫出门。谨慎言行无大患，安稳平安度晨昏。",i:"财运：小破财，无大碍；事业：小挫折，无大碍；感情：小矛盾，无大碍；健康：小感冒，无大碍；今日建议：少出门，谨慎言行。",w:30},
+  {n:51,l:"小凶",t:"运途多舛",p:"运途多舛事难成，处处碰壁心不宁。劝君莫要太急躁，守待时来运自通。",i:"财运：处处破财，事事不顺；事业：处处失败，事事碰壁；感情：事事吵架，事事不顺；健康：事事生病，事事受伤；今日建议：保持耐心，等待时机。",w:30},
+  {n:52,l:"小凶",t:"官非小扰",p:"官非小扰事不大，破财消灾即可罢。若还强争不肯休，小事变大祸临头。",i:"财运：因官非小破财、罚款；事业：因官非小影响、被警告；感情：因官非小影响、心情差；健康：因官非小焦虑、失眠；今日建议：破财消灾，小事化了。",w:30},
+  {n:53,l:"小凶",t:"失物难觅",p:"失物难觅影无踪，费尽心思总是空。劝君莫再苦追寻，破财免灾保平安。",i:"财运：丢失小物品、无大碍；事业：丢失小文件、无大碍；感情：丢失小礼物、无大碍；健康：丢失小健康、无大碍；今日建议：放弃寻找，接受损失。",w:30},
+  {n:54,l:"小凶",t:"谋事多阻",p:"谋事多阻难顺利，中间总有小插曲。耐心坚持终可成，莫因小挫便放弃。",i:"财运：求财多阻，需耐心；事业：做事多阻，需耐心；感情：求爱多阻，需耐心；健康：康复多阻，需耐心；今日建议：耐心坚持，不放弃。",w:30},
+  {n:55,l:"小凶",t:"六亲少助",p:"六亲少助力不足，凡事只能靠自己。莫指望人来帮衬，独立自强是正途。",i:"财运：无人借钱，无人投资；事业：无人帮助，无人提携；感情：无人介绍，无人关心；健康：无人照顾，只能靠自己；今日建议：独立自强，不依赖别人。",w:30},
+  {n:56,l:"小凶",t:"运蹇时乖",p:"运蹇时乖步难移，事事不如意。劝君莫要强出头，守待时来运自奇。",i:"财运：事事破财，处处不顺；事业：事事失败，处处碰壁；感情：事事吵架，处处不顺；健康：事事生病，处处受伤；今日建议：低调做人，不与人争。",w:30},
+  {n:57,l:"小凶",t:"口舌招尤",p:"口舌招尤惹是非，祸从口出要牢记。守口如瓶少言语，免教灾祸到身边。",i:"财运：因口舌小破财；事业：因口舌被批评、降职；感情：因口舌吵架、冷战；健康：因口舌被打、受伤；今日建议：少说话，多做事。",w:30},
+  {n:58,l:"小凶",t:"疾病缠身",p:"疾病缠身久不愈，药石无功苦自知。劝君安心养身体，莫要操劳费心思。",i:"财运：因病小破财；事业：因病请假、影响工作；感情：因病被照顾、感情升温；健康：慢性病、久治不愈；今日建议：安心养病，停止工作。",w:30},
+  {n:59,l:"小凶",t:"婚姻多磨",p:"婚姻多磨多坎坷，夫妻不和常吵骂。若还互相多忍让，终能白头共荣华。",i:"财运：因婚姻小破财；事业：因婚姻分心、工作失误；感情：夫妻不和、吵架；健康：因婚姻气出病、失眠；今日建议：互相忍让，多沟通。",w:30},
+  {n:60,l:"小凶",t:"投机不利",p:"投机不利必破财，取巧反惹祸临身。劝君莫要贪小利，守财安分度光阴。",i:"财运：投机必亏，取巧必败；事业：投机项目失败、公司亏损；感情：因投机失败被抛弃；健康：因投机失败急火攻心；今日建议：不投机，不取巧，守财为上。",w:30},
+  {n:61,l:"次于中平",t:"微雨阻途",p:"微雨沾衣路稍迷，莫行险处莫贪痴。守心静待风波过，依旧平安不用悲。",i:"财运：小破财，无大碍；事业：小阻滞，耐心可过；感情：小误会，沟通可解；健康：小感冒，无大碍；今日建议：宜静不宜动，耐心等待。",w:20},
+  {n:62,l:"次于中平",t:"口舌微妨",p:"是非口舌莫相争，退一步时路自平。谨慎言辞无大患，安心守己保安宁。",i:"财运：因口舌小破财；事业：因口舌被批评；感情：因口舌小吵架；健康：因口舌心情不好；今日建议：退一步海阔天空。",w:20},
+  {n:63,l:"次于中平",t:"小耗财",p:"小小耗财免灾殃，莫为小钱断肝肠。守心守己莫贪利，安稳平安度时光。",i:"财运：小破财，消灾免祸；事业：小损失，无大碍；感情：小花费，无大碍；健康：小花费，无大碍；今日建议：破财消灾，不必在意。",w:20},
+  {n:64,l:"次于中平",t:"小阻碍",p:"谋望中间小阻碍，耐心守待自然开。莫急莫躁莫强行，免惹小灾免惹灾。",i:"财运：求财小阻，耐心可得；事业：做事小阻，耐心可成；感情：求爱小阻，耐心可得；健康：康复小阻，耐心可愈；今日建议：耐心等待，不急躁。",w:20},
+  {n:65,l:"次于中平",t:"防小人",p:"小人暗里有微言，谨慎言行莫向前。守待时光风波过，依然安稳度流年。",i:"财运：被小人小算计、小破财；事业：被小人小陷害、小影响；感情：被小人小挑拨、小误会；健康：被小人小暗算、小影响；今日建议：防小人，少说话。",w:20},
+  {n:66,l:"次于中平",t:"不宜远行",p:"不宜远行防小阻，路途恐有小延误。安分守己家中坐，安稳平安是福途。",i:"财运：远行小破财、小损失；事业：出差小延误、小影响；感情：远行小吵架、小误会；健康：远行小感冒、小不适；今日建议：不远行，少出门。",w:20},
+  {n:67,l:"次于中平",t:"心情微滞",p:"心情微滞不开心，琐事缠身恼意深。放宽心态莫计较，依旧平安不用嗔。",i:"财运：无破财；事业：无影响；感情：无矛盾；健康：心情差、失眠；今日建议：放松心情，听听音乐。",w:20},
+  {n:68,l:"次于中平",t:"谋望小迟",p:"谋望之事稍迟延，不是不成慢几天。莫急莫躁莫催促，守待时光自然圆。",i:"财运：求财稍迟，耐心可得；事业：做事稍迟，耐心可成；感情：求爱稍迟，耐心可得；健康：康复稍迟，耐心可愈；今日建议：耐心等待，不催促。",w:20},
+  {n:69,l:"次于中平",t:"防小误",p:"谨慎提防小失误，莫因大意惹麻烦。细心做事无大患，安稳平安度日常。",i:"财运：因小失误小破财；事业：因小失误被批评；感情：因小失误闹误会；健康：因小失误受小伤；今日建议：细心做事，不马虎。",w:20},
+  {n:70,l:"次于中平",t:"少聚会",p:"少去聚会少喧哗，免惹口舌免招瑕。安分守己家中守，安稳平安度年华。",i:"财运：聚会小破财；事业：聚会影响工作；感情：聚会惹桃花；健康：聚会喝酒伤身；今日建议：少聚会，多在家。",w:20},
+  {n:71,l:"次于中平",t:"小烦恼",p:"小小烦恼扰心头，放下随缘不用愁。莫为小事生闷气，伤神伤身不划算。",i:"财运：无破财；事业：无影响；感情：无矛盾；健康：心情差、烦躁；今日建议：放下烦恼，顺其自然。",w:20},
+  {n:72,l:"次于中平",t:"宜忍宜守",p:"宜忍宜守莫前行，妄动恐招小灾星。忍耐一时风波过，依然安稳保安宁。",i:"财运：妄动小破财，守守则安；事业：妄动小失败，守守则稳；感情：妄动小吵架，守守则和；健康：妄动小受伤，守守则康；今日建议：忍耐，守待。",w:20},
+  {n:73,l:"次于中平",t:"防漏财",p:"提防漏财小损失，管好钱物莫粗心。谨慎守财无大患，安稳平安度光阴。",i:"财运：丢小东西、花冤枉钱；事业：无影响；感情：无影响；健康：无影响；今日建议：管好钱包，不丢东西。",w:20},
+  {n:74,l:"次于中平",t:"小是非",p:"小小是非莫当真，清者自清莫较真。退让一步无大祸，安稳平安度晨昏。",i:"财运：无破财；事业：小影响；感情：小误会；健康：心情差；今日建议：不理会，不较真。",w:20},
+  {n:75,l:"次于中平",t:"身体微恙",p:"身体微恙小不适，注意休息莫操劳。保养调理无大碍，安稳安康自逍遥。",i:"财运：无破财；事业：小影响；感情：无影响；健康：小感冒、疲劳；今日建议：注意休息，多喝水。",w:20},
+  {n:76,l:"次于中平",t:"莫贪小利",p:"莫贪小利惹麻烦，贪得小便宜失大。安分守己走正路，安稳平安免祸端。",i:"财运：贪小利吃大亏；事业：贪小利误大事；感情：贪小利失人心；健康：贪小利吃坏肚子；今日建议：不贪小利，走正路。",w:20},
+  {n:77,l:"次于中平",t:"计划小阻",p:"计划略有小阻挡，不是不成慢一场。莫急莫躁莫放弃，坚持终可得安康。",i:"财运：计划稍迟，耐心可得；事业：计划稍迟，耐心可成；感情：计划稍迟，耐心可得；健康：计划稍迟，耐心可愈；今日建议：坚持，不放弃。",w:20},
+  {n:78,l:"次于中平",t:"少争执",p:"少与人争少斗气，气出病来无人替。忍让宽容无大祸，平安安稳度时光。",i:"财运：无破财；事业：小影响；感情：小矛盾；健康：气出病；今日建议：不争执，多忍让。",w:20},
+  {n:79,l:"次于中平",t:"守待则安",p:"守待则安莫强求，妄行恐惹小忧愁。安分守己时光过，依旧平安不用愁。",i:"财运：强求小破财，守待则安；事业：强求小失败，守待则稳；感情：强求小受伤，守待则和；健康：强求小不适，守待则康；今日建议：守待，不强求。",w:20},
+  {n:80,l:"次于中平",t:"平淡度过",p:"平淡度过此段时，无大灾殃无大禧。守心守口莫妄动，安稳平安免祸欺。",i:"财运：无破财；事业：无起伏；感情：无波澜；健康：无大病；今日建议：平淡度日，不折腾。",w:20},
+  {n:81,l:"中平",t:"渐入佳境",p:"一步一步上高台，虽无急速亦能来。耐心守得云开日，自有清风送福回。",i:"财运：财运渐好，有小收入；事业：事业渐顺，有小进步；感情：感情渐好，有小甜蜜；健康：身体渐好，有小起色；今日建议：循序渐进，不急躁。",w:12},
+  {n:82,l:"中平",t:"细水长流",p:"不求骤富但求安，细水长流亦可观。守正安分无灾祸，平平淡淡是清欢。",i:"财运：财运平稳，有稳定收入；事业：事业平稳，有稳定发展；感情：感情平稳，有稳定关系；健康：身体平稳，无大病；今日建议：守正安分，不冒进。",w:12},
+  {n:83,l:"中平",t:"小有安稳",p:"小小安稳度光阴，无大灾殃无大财。守己安心莫乱动，平安无事福自来。",i:"财运：无破财，有小积蓄；事业：无挫折，有小成绩；感情：无矛盾，有小幸福；健康：无大病，有小健康；今日建议：安心度日，不折腾。",w:12},
+  {n:84,l:"中平",t:"谨慎则吉",p:"谨慎行事则吉祥，莫贪莫急莫逞强。守心守口无灾祸，安稳平安度日常。",i:"财运：谨慎则得财，贪急则破财；事业：谨慎则成功，贪急则失败；感情：谨慎则和睦，贪急则吵架；健康：谨慎则健康，贪急则受伤；今日建议：谨慎行事，不逞强。",w:12},
+  {n:85,l:"中平",t:"守待时机",p:"时机未到莫强求，守待时光不用愁。待到风云相助日，自然得利不用忧。",i:"财运：时机未到，守财则安；事业：时机未到，守业则稳；感情：时机未到，守情则和；健康：时机未到，守身则康；今日建议：守待时机，不妄动。",w:12},
+  {n:86,l:"中平",t:"少灾少难",p:"少灾少难保安康，无大纷争无大伤。安分守己多行善，平平淡淡是吉祥。",i:"财运：无大破财，有小收入；事业：无大挫折，有小进步；感情：无大矛盾，有小甜蜜；健康：无大病，有小健康；今日建议：多行善，积福德。",w:12},
+  {n:87,l:"中平",t:"和合小吉",p:"家庭和合少风波，感情平稳乐呵呵。莫为小事生争执，安稳安康福自多。",i:"财运：家庭和睦则财旺；事业：家庭和睦则业兴；感情：家庭和睦则情顺；健康：家庭和睦则身健；今日建议：家庭和睦，不争吵。",w:12},
+  {n:88,l:"中平",t:"求财小利",p:"求财只有小利盈，莫贪大财莫强行。谨慎经营无大险，安稳安康度平生。",i:"财运：有小财，无大财；事业：有小成，无大成；感情：有小喜，无大喜；健康：有小安，无大险；今日建议：谨慎经营，不贪大财。",w:12},
+  {n:89,l:"中平",t:"谋望小成",p:"谋望之事小能成，中间略有小纷争。坚持忍耐终得利，不可急躁不可争。",i:"财运：谋财小成，耐心可得；事业：谋事小成，耐心可成；感情：谋爱小成，耐心可得；健康：康复小成，耐心可愈；今日建议：坚持忍耐，不急躁。",w:12},
+  {n:90,l:"中平",t:"平稳无虞",p:"平稳度日无灾虞，是非不扰自安居。莫求大变莫求动，安稳安康是福基。",i:"财运：平稳无破财；事业：平稳无挫折；感情：平稳无矛盾；健康：平稳无大病；今日建议：平稳度日，不变动。",w:12},
+  {n:91,l:"中平",t:"防小失吉",p:"防微杜渐免小失，谨慎言行免祸端。安分守己无大患，平安安稳度时光。",i:"财运：防小失则得财；事业：防小失则成功；感情：防小失则和睦；健康：防小失则健康；今日建议：防微杜渐，不粗心。",w:12},
+  {n:92,l:"中平",t:"宜静宜守吉",p:"宜静宜守莫前行，妄动恐招小灾星。守待时光风波过，依然安稳保安宁。",i:"财运：静守则财安；事业：静守则业稳；感情：静守则情和；健康：静守则身康；今日建议：静守，不妄动。",w:12},
+  {n:93,l:"优于中平",t:"旭日初升",p:"旭日初升万象新，出门谋望有知音。虽经小滞终无碍，稳步前行得万金。",i:"财运：财运上升，有不错收入；事业：事业上升，有不错发展；感情：感情上升，有不错进展；健康：身体上升，有不错状态；今日建议：稳步前行，不冒进。",w:6},
+  {n:94,l:"优于中平",t:"风平浪静",p:"风波已过见青天，万事安然福自然。莫为闲愁生忧虑，顺风顺水过流年。",i:"财运：财运平稳，无破财；事业：事业平稳，无挫折；感情：感情平稳，无矛盾；健康：身体平稳，无大病；今日建议：顺其自然，不忧虑。",w:6},
+  {n:95,l:"优于中平",t:"贵人助力",p:"贵人暗里助君行，谋望求财不用惊。谨慎前行无大险，平安顺利得功成。",i:"财运：有贵人相助，得财顺利；事业：有贵人相助，做事顺利；感情：有贵人相助，感情顺利；健康：有贵人相助，康复顺利；今日建议：抓住贵人，好好把握。",w:6},
+  {n:96,l:"优于中平",t:"家和业兴",p:"家庭和睦喜气生，事业平稳向前行。财禄渐增无大险，平安安稳过光阴。",i:"财运：家和则财旺；事业：家和则业兴；感情：家和则情顺；健康：家和则身健；今日建议：家庭和睦，事业兴旺。",w:6},
+  {n:97,l:"优于中平",t:"谋望可成",p:"心有所谋终可成，中间虽有小纷争。坚持到底无阻碍，得福得财喜临门。",i:"财运：谋财可成，坚持可得；事业：谋事可成，坚持可成；感情：谋爱可成，坚持可得；健康：康复可成，坚持可愈；今日建议：坚持到底，不放弃。",w:6},
+  {n:98,l:"优于中平",t:"平安吉祥",p:"出入平安福自来，家门吉庆无凶灾。安心守己多行善，万事和谐笑颜开。",i:"财运：平安则财安；事业：平安则业稳；感情：平安则情和；健康：平安则身健；今日建议：多行善，积福德。",w:6},
+  {n:99,l:"大吉",t:"春风得意",p:"春来无处不飞花，万里青云路不赊。此去前程多顺遂，家门吉庆福无涯。",i:"财运：财运亨通，财源广进；事业：事业顺遂，步步高升；感情：感情美满，幸福甜蜜；健康：身体健康，平安无恙；今日建议：大胆前行，心想事成。",w:2},
+  {n:100,l:"大吉",t:"金玉满堂",p:"宝镜团圆照满堂，财源广进日荣昌。家门喜庆无灾厄，福禄绵绵岁月长。",i:"财运：财运极佳，金玉满堂；事业：事业极佳，名利双收；感情：感情极佳，阖家欢乐；健康：身体极佳，福寿安康；今日建议：把握好运，大展宏图。",w:2},
+];
+
+// Weighted random draw
+function drawSign() {
+  const total = SIGNS.reduce((s, sg) => s + sg.w, 0);
+  let r = Math.random() * total;
+  for (const sg of SIGNS) {
+    r -= sg.w;
+    if (r <= 0) return sg;
+  }
+  return SIGNS[SIGNS.length - 1];
+}
+
+// ── Prompt Template ──
+function buildPrompt(ui, question, sign) {
+  return `你是一位精通吕祖灵签的专业解签师。吕祖灵签源自道教吕洞宾祖师信仰，传统用于指引迷津、趋吉避凶。你深谙传统解签之道，同时兼具温暖、智慧、接地气的话术风格，将古老签文智慧转化为现代人能懂、能用的指引。
+
+【用户信息】
+昵称：${ui.nickname}
+性别：${ui.gender}
+年龄段：${ui.age_range}
+感情状态：${ui.emotion_status}
+
+【用户问题】
+${question}
+
+【抽签结果】
+签号：第${sign.n}签
+签级：${sign.l}
+签题：${sign.t}
+签文：${sign.p}
+解文：${sign.i}
+
+【解签专业知识框架】
+
+一、传统解签三步法："以象取义→因人解签→因事断吉凶"
+- 以象取义：签文诗偈中的意象是解签的根基。风、雨、浪主变动与考验；花、月、春主希望与转机；山、门、路主事业与前景；舟、桥、渡主过渡与抉择。不可脱离签文意象凭空解读，必须从签文中提取象征，再映射到用户所问之事。
+- 因人解签：同一签对不同人解读截然不同。年龄影响人生阶段判断；性别影响话术方式；感情状态影响感情维度的侧重。必须结合用户信息差异化解读。
+- 因事断吉凶：同一签对不同事吉凶不同。必须聚焦用户所问之事，不可泛泛而谈、面面俱到。
+
+二、签级解读核心原则：
+- 凶签：传统讲究"凶中藏机，否极泰来"。着重指出风险所在，同时必须点明转机方向——"知凶则避，避凶趋吉"。凶签的真正价值在于预警，提前规避即是最大的吉。
+- 小凶签：凶象较轻，多因自身行为或心态不当所致。侧重提醒与防范，强调"改变方式即可化解"，给用户具体的调整方向。
+- 次于中平签：偏下但不至凶，提示当前运势偏低需耐心等待。忌冒进，宜蓄力，"退一步海阔天空"。
+- 中平签：平平无奇但稳当，守成为主。不宜大动，但也不必忧虑，"稳中求进"。
+- 优于中平签：偏上但未至大吉，可适度进取。但不可贪心冒进，"见好就收"方能长久。
+- 大吉签：运势鼎盛。但传统智慧讲究"盛极当思退，物极必反"。吉中藏慎，提醒用户珍惜当下、不盲目扩张，方为真吉。
+
+三、话术转化借鉴心理学框架：
+- SFBT：聚焦"接下来可以做什么"，用"例外提问"思维找积极因素
+- 积极心理学：嵌入"心理韧性"概念，给用户"我能应对"的效能感
+- 叙事疗法"外化"：把困境与用户本人分开，减轻用户自责
+- 动机访谈：以"你可以试试……"而非"你必须……"的句式
+
+四、传统解签禁忌：
+- 不可断言"一定会如何"
+- 健康问题必须建议就医
+- 不可制造恐惧
+- 不可过度安慰，吉签不可承诺"包成功"
+
+【输出要求】
+请严格按以下三段结构输出，每段50-100字，使用JSON格式：
+
+1. question_breakdown：识别核心维度（财运/事业/感情/健康/人际），点明1-2个辅维度，明确用户意图（求方向/求确认/求安慰）
+2. sign_translation：从签文意象提取与用户问题相关的象征，翻译为与用户个人信息和处境直接相关的白话解读
+3. user_friendly_advice：融合SFBT+积极心理学+叙事疗法的话术转化，给具体可操作的小步骤，以"你可以试试"句式结尾
+
+注意：凶签"凶中藏机"，大吉签"吉中藏慎"，健康问题必须建议就医。每段严格50-100字。必须返回合法JSON，不含多余文本。
+
+请直接返回JSON：
+{"question_breakdown":"...","sign_translation":"...","user_friendly_advice":"..."}`;
+}
+
+// ── API Call (Gemini 2.5 Flash) ──
+async function callClaude(prompt, apiKey) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.candidates[0].content.parts[0].text;
+}
+
+// ── Main Flow ──
+let currentSign = null;
+
+async function startShake() {
+  const nickname = document.getElementById('nickname').value.trim() || '朋友';
+  const gender = document.getElementById('gender').value;
+  const age_range = document.getElementById('age_range').value;
+  const emotion_status = document.getElementById('emotion_status').value;
+  const user_question = document.getElementById('user_question').value.trim();
+  const api_key = document.getElementById('api_key').value.trim();
+
+  const errEl = document.getElementById('error-msg');
+  errEl.style.display = 'none';
+
+  if (!user_question) {
+    showError('请先在心中写下您的问题，再诚心求签。');
+    return;
+  }
+  if (!api_key) {
+    showError('请填写您的 Google Gemini API Key 以启用 AI 解签功能。');
+    return;
+  }
+
+  // Draw sign
+  currentSign = drawSign();
+
+  // Show sign panel
+  showSignPanel(currentSign);
+
+  // Show loading
+  document.getElementById('loading-wrap').style.display = 'block';
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('btn-shake').disabled = true;
+
+  const ui = { nickname, gender, age_range, emotion_status };
+  const prompt = buildPrompt(ui, user_question, currentSign);
+
+  try {
+    const raw = await callClaude(prompt, api_key);
+    let json = raw.trim();
+    if (json.includes('```json')) json = json.split('```json')[1].split('```')[0].trim();
+    else if (json.includes('```')) json = json.split('```')[1].split('```')[0].trim();
+
+    const parsed = JSON.parse(json);
+    showResult(parsed);
+  } catch (e) {
+    console.error(e);
+    showError('AI 解签失败：' + e.message + '。请检查 API Key 是否正确，或稍后再试。');
+  } finally {
+    document.getElementById('loading-wrap').style.display = 'none';
+    document.getElementById('btn-shake').disabled = false;
+  }
+}
+
+function showSignPanel(sign) {
+  const panel = document.getElementById('sign-panel');
+  panel.style.display = 'block';
+
+  document.getElementById('sign-number-badge').textContent = `第 ${sign.n} 签`;
+  const levelTag = document.getElementById('sign-level-tag');
+  levelTag.textContent = sign.l;
+  levelTag.className = 'sign-level-tag level-' + sign.l;
+  document.getElementById('sign-title-text').textContent = sign.t;
+
+  // Format poem with line breaks
+  const lines = sign.p.split('，').join('，\n').split('。').join('。\n').split('\n').filter(l => l.trim());
+  document.getElementById('sign-poem-text').innerHTML = lines.map(l => l.trim()).join('<br>');
+  document.getElementById('sign-interp').textContent = sign.i;
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showResult(parsed) {
+  document.getElementById('res-breakdown').textContent = parsed.question_breakdown || '';
+  document.getElementById('res-translation').textContent = parsed.sign_translation || '';
+  document.getElementById('res-advice').textContent = parsed.user_friendly_advice || '';
+
+  const panel = document.getElementById('result-panel');
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function resetAll() {
+  document.getElementById('sign-panel').style.display = 'none';
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('loading-wrap').style.display = 'none';
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('user_question').value = '';
+  document.getElementById('step1').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
